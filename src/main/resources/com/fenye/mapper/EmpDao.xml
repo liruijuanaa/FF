@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fenye.dao.EmpDao">
+
+    <resultMap type="com.fenye.entity.Emp" id="EmpMap">
+        <result property="id" column="ID" jdbcType="VARCHAR"/>
+        <result property="empname" column="EMPNAME" jdbcType="VARCHAR"/>
+        <result property="salary" column="SALARY" jdbcType="NUMERIC"/>
+        <result property="age" column="AGE" jdbcType="INTEGER"/>
+        <result property="deptname" column="DEPTNAME" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="EmpMap">
+        select
+          ID, EMPNAME, SALARY, AGE, DEPTNAME
+        from goods.emp
+        where ID = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="EmpMap">
+        select
+          ID, EMPNAME, SALARY, AGE, DEPTNAME
+        from goods.emp
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Integer">
+     select count(id) from goods.emp
+     </select>
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultType="com.fenye.util.People">
+        select
+        ID, EMPNAME, SALARY, AGE, DEPTNAME
+        from goods.emp
+       limit #{offset}, #{pageNumber}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into goods.emp(EMPNAME, SALARY, AGE, DEPTNAME)
+        values (#{empname}, #{salary}, #{age}, #{deptname})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into goods.emp(EMPNAME, SALARY, AGE, DEPTNAME)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.empname}, #{entity.salary}, #{entity.age}, #{entity.deptname})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into goods.emp(EMPNAME, SALARY, AGE, DEPTNAME)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.empname}, #{entity.salary}, #{entity.age}, #{entity.deptname})
+        </foreach>
+        on duplicate key update
+        EMPNAME = values(EMPNAME) , SALARY = values(SALARY) , AGE = values(AGE) , DEPTNAME = values(DEPTNAME)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update goods.emp
+        <set>
+            <if test="empname != null and empname != ''">
+                EMPNAME = #{empname},
+            </if>
+            <if test="salary != null">
+                SALARY = #{salary},
+            </if>
+            <if test="age != null">
+                AGE = #{age},
+            </if>
+            <if test="deptname != null and deptname != ''">
+                DEPTNAME = #{deptname},
+            </if>
+        </set>
+        where ID = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from goods.emp where ID = #{id}
+    </delete>
+
+</mapper>
